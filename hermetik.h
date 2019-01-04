@@ -142,11 +142,11 @@
 //					> Requires the exact keys in the exact order, in order
 //					  to decrypt.
 //		[ ] TODO: Implement quantum-resistant encryption (NTRU)
-//					> This was implemented in a pre-alpha version. The issue is that
-//					  the decryption was failing on iOS devices. The issue was noted
-//					  on various online bug trackers, no resolution at the time of this
-//					  writing (16-12-2018). Maybe we can debug with LLDB if it is not
-//					  an algorithm related issue.
+//					> This was implemented in a pre-alpha version. The issue is
+//					  that the decryption was failing on iOS devices. The issue
+//					  was noted on various online bug trackers, no resolution at
+//				      the time of this writing (16-12-2018). Maybe we can debug
+//					  with LLDB if it is not an algorithm related issue.
 //					> Implement function calls exclusively for macOS?
 //		[ ]	TODO: Dynamic blocks; e.g. setting the block data size at runtime.
 //
@@ -378,8 +378,8 @@ bool hermetik_delete_sqlite3_keypair_by_id_v2(const sqlite3 db,
 #define HERMETIK_BLOCK_COMPARE_ERROR			(-1)
 
 //	The hermetik_block type is the basis for more complex types requiring
-//	public-key encryption. A hermetik_block represents a 'block' of data, with pointers
-//	to both the encrypted and un-encrypted forms of said data.
+//	public-key encryption. A hermetik_block represents a 'block' of data,
+//	with pointers to both the encrypted and un-encrypted forms of said data.
 //
 typedef struct hermetik_block
 {
@@ -470,8 +470,8 @@ typedef struct hermetik_note
 } hermetik_note;
 
 //	The hermetik_note_compare_summary type is used in the comparison of
-//	different hermetik_notes. It is a complex type that solves the issue of multiple
-//	function calls to compare notes. 
+//	different hermetik_notes. It is a complex type that solves the issue of
+//	multiple function calls to compare notes. 
 //
 typedef struct hermetik_note_compare_summary
 {
@@ -697,6 +697,204 @@ bool hermetik_delete_sqlite3_note_by_id(const char *db_path,
 bool hermetik_delete_sqlite3_note_by_id_v2(const sqlite3 *db,
 										   unsigned int db_id);
 
+//______________________________________________________________________________
+
+#define HERMETIK_MAIL_ADDRESS_USERNAME_SIZE_BYTES \
+	(HERMETIK_BLOCK_DATA_SIZE_BYTES)
+
+#define HERMETIK_MAIL_ADDRESS_USERNAME_AS_HEX_SIZE_BYTES \
+	((HERMETIK_MAIL_ADDRESS_USERNAME_SIZE_BYTES * 2) + 1)
+
+#define HERMETIK_MAIL_ADDRESS_ENC_USERNAME_SIZE_BYTES \
+	(HERMETIK_BLOCK_ENC_DATA_SIZE_BYTES)
+
+#define HERMETIK_MAIL_ADDRESS_ENC_USERNAME_AS_HEX_SIZE_BYTES \
+	((HERMETIK_MAIL_ADDRESS_ENC_USERNAME_SIZE_BYTES * 2) + 1)
+
+#define HERMETIK_MAIL_ADDRESS_HOSTNAME_SIZE_BYTES \
+	(HERMETIK_BLOCK_DATA_SIZE_BYTES)
+
+#define HERMETIK_MAIL_ADDRESS_HOSTNAME_AS_HEX_SIZE_BYTES \
+	((HERMETIK_MAIL_ADDRESS_HOSTNAME_SIZE_BYTES * 2) + 1)
+
+#define HERMETIK_MAIL_ADDRESS_ENC_HOSTNAME_SIZE_BYTES \
+	(HERMETIK_BLOCK_ENC_DATA_SIZE_BYTES)
+
+#define HERMETIK_MAIL_ADDRESS_ENC_HOSTNAME_AS_HEX_SIZE_BYTES \
+	((HERMETIK_MAIL_ADDRESS_ENC_HOSTNAME_SIZE_BYTES * 2) + 1)
+
+#define HERMETIK_MAIL_ADDRESS_PUBLIC_KEY_SIZE_BYTES \
+	(HERMETIK_KEYPAIR_PUBLIC_KEY_SIZE_BYTES)
+
+#define HERMETIK_MAIL_ADDRESS_PUBLIC_KEY_AS_HEX_SIZE_BYTES \
+	((HERMETIK_MAIL_ADDRESS_PUBLIC_KEY_SIZE_BYTES * 2) + 1)
+
+// TODO **
+typedef struct hermetik_mail_address
+{
+	hermetik_block *username;
+	hermetik_block *hostname;
+	int port;
+	unsigned char *public_key;
+} hermetik_mail_address;
+
+// TODO **
+void hermetik_init_mail_address(hermetik_mail_address *hma);
+
+// TODO
+void hermetik_init_mail_address_with_address(hermetik_mail_address *hma,
+										     const hermetik_mail_address *src);
+
+// TODO **
+void hermetik_free_mail_address(hermetik_mail_address *hma);
+
+// TODO **
+void hermetik_mail_address_username_to_hex(const hermetik_mail_address *hma,
+										   char *hex);
+
+// TODO **
+void hermetik_mail_address_enc_username_to_hex(const hermetik_mail_address *hma,
+											   char *hex);
+
+// TODO **
+void hermetik_mail_address_hostname_to_hex(const hermetik_mail_address *hma,
+										   char *hex);
+
+// TODO **
+void hermetik_mail_address_enc_hostname_to_hex(const hermetik_mail_address *hma,
+											   char *hex);
+
+// TODO
+void hermetik_mail_address_set_username(hermetik_mail_address *hma,
+										const unsigned char *d,
+										size_t dlen);
+// TODO
+void hermetik_mail_address_set_enc_username(hermetik_mail_address *hma,
+										    const unsigned char *d,
+											size_t dlen);
+
+// TODO
+void hermetik_mail_address_set_hostname(hermetik_mail_address *hma,
+										const unsigned char *d,
+										size_t dlen);
+// TODO
+void hermetik_mail_address_set_enc_hostname(hermetik_mail_address *hma,
+											const unsigned char *d,
+											size_t dlen);
+
+// TODO
+void hermetik_mail_address_set_port(hermetik_mail_address *hma,
+									int port_num);
+
+// TODO
+void hermetik_mail_address_set_public_key(hermetik_mail_address *hma,
+										  const unsigned char *d);
+
+// TODO
+void hermetik_mail_address_zero_username(hermetik_mail_address *hma);
+
+// TODO
+void hermetik_mail_address_zero_hostname(hermetik_mail_address *hma);
+
+// TODO
+void hermetik_mail_address_zero_public_key(hermetik_mail_address *hma);
+
+// TODO
+void hermetik_mail_address_zero(hermetik_mail_address *hma);
+
+// TODO
+void hermetik_mail_address_enc_username(hermetik_mail_address *hma,
+										const hermetik_keypair *kp);
+// TODO
+void hermetik_mail_address_enc_hostname(hermetik_mail_address *hma,
+										const hermetik_keypair *kp);
+// TODO
+void hermetik_mail_address_enc(hermetik_mail_address *hma,
+							   const hermetik_keypair *kp);
+// TODO
+void hermetik_mail_address_dec_username(hermetik_mail_address *hma,
+										const hermetik_keypair *kp);
+// TODO
+void hermetik_mail_address_dec_hostname(hermetik_mail_address *hma,
+										const hermetik_keypair *kp);
+// TODO
+void hermetik_mail_address_dec(hermetik_mail_address *hma,
+							   const hermetik_keypair *kp);
+
+// TODO
+void hermetik_mail_address_cpy_username(unsigned char *dst,
+										const hermetik_mail_address *hma);
+
+// TODO
+void hermetik_mail_address_cpy_enc_username(unsigned char *dst,
+											const hermetik_mail_address *hma);
+
+// TODO
+void hermetik_mail_address_cpy_hostname(unsigned char *dst,
+										const hermetik_mail_address *hma);
+
+// TODO
+void hermetik_mail_address_cpy_enc_hostname(unsigned char *dst,
+											const hermetik_mail_address *hma);
+
+// TODO
+void hermetik_mail_address_cpy_public_key(unsigned char *dst,
+										  const hermetik_mail_address *hma);
+
+// TODO
+void hermetik_mail_address_cpy(hermetik_mail_address *dst,
+							   const hermetik_mail_address *src);
+
+// TODO
+typedef struct hermetik_mail_address_comparator
+{
+	bool identical;
+	bool error_occurred;
+	bool usernames_differ;
+	bool hostnames_differ;
+	bool encrypted_usernames_differ;
+	bool encrypted_hostnames_differ;
+	bool ports_differ;
+	bool public_keys_differ;
+} hermetik_mail_address_comparator;
+
+// TODO
+void hermetik_init_mail_address_comparator(
+								hermetik_mail_address_comparator *mac);
+
+// TODO
+void hermetik_free_mail_address_comparator(
+								hermetik_mail_address_comparator *mac);
+
+// TODO
+bool hermetik_mail_address_cmp_usernames(const hermetik_mail_address *hma,
+										 const hermetik_mail_address *hma2);
+
+// TODO
+bool hermetik_mail_address_cmp_hostnames(const hermetik_mail_address *hma,
+										 const hermetik_mail_address *hma2);
+
+// TODO
+bool hermetik_mail_address_cmp_enc_usernames(const hermetik_mail_address *hma,
+											 const hermetik_mail_address *hma2);
+
+// TODO
+bool hermetik_mail_address_cmp_enc_hostnames(const hermetik_mail_address *hma,
+											 const hermetik_mail_address *hma2);
+
+// TODO
+bool hermetik_mail_address_cmp_ports(const hermetik_mail_address *hma,
+									 const hermetik_mail_address *hma2);
+
+// TODO
+bool hermetik_mail_address_cmp_public_keys(const hermetik_mail_address *hma,
+										   const hermetik_mail_address *hma2);
+
+// TODO
+void hermetik_mail_address_cmp(hermetik_mail_address_comparator *mac,
+							   const hermetik_mail_address *hma,
+							   const hermetik_mail_address *hma2);
+
 //---------------------------- Helper Functions --------------------------------
 
 void hermetik_hex_dump_str(const unsigned char *str,
@@ -708,6 +906,12 @@ char **hermetik_str_split(char *a_str,
 
 //------------------------------------------------------------------------------
 #endif
+
+
+
+
+
+
 
 
 

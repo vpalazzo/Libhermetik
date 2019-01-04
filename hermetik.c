@@ -3909,17 +3909,121 @@ void hermetik_note_compare(const hermetik_note *hn,
 					  !ncs->enc_bodies_differ);
 }
 
+void hermetik_init_mail_address(hermetik_mail_address *hma)
+{
+	if (!hma)
+	{
+		return;
+	}
 
+	hma->username = calloc(1, sizeof(hermetik_block));
+	hma->hostname = calloc(1, sizeof(hermetik_block));
+	hma->public_key = calloc(HERMETIK_KEYPAIR_PUBLIC_KEY_SIZE_BYTES,
+							 sizeof(unsigned char));
 
+	if (!hma->username ||
+		!hma->hostname ||
+		!hma->public_key)
+	{
+		hermetik_free_mail_address(hma);
+		return;
+	}
 
+	hermetik_init_block(hma->username);
+	hermetik_init_block(hma->hostname);
+	hma->port = 0;
+}
 
+void hermetik_free_mail_address(hermetik_mail_address *hma)
+{
+	if (!hma)
+	{
+		return;
+	}
 
+	if (hma->username)
+	{
+		hermetik_free_block(hma->username);
+		free(hma->username);
+	}
 
+	if (hma->hostname)
+	{
+		hermetik_free_block(hma->hostname);
+		free(hma->hostname);
+	}
 
+	if (hma->public_key)
+	{
+		free(hma->public_key);
+	}
 
+	hma->port = 0;
+}
 
+void hermetik_mail_address_username_to_hex(const hermetik_mail_address *hma,
+										   char *hex)
+{
+	if (!hma 			||
+		!hma->username 	||
+		!hma->username->data)
+	{
+		return;
+	}
 
+	sodium_bin2hex(hex,
+				   HERMETIK_MAIL_ADDRESS_USERNAME_AS_HEX_SIZE_BYTES,
+				   hma->username->data,
+				   HERMETIK_MAIL_ADDRESS_USERNAME_SIZE_BYTES);
+}
 
+void hermetik_mail_address_enc_username_to_hex(const hermetik_mail_address *hma,
+											   char *hex)
+{
+	if (!hma 			||
+		!hma->username 	||
+		!hma->username->encrypted_data)
+	{
+		return;
+	}
+
+	sodium_bin2hex(hex,
+				   HERMETIK_MAIL_ADDRESS_ENC_USERNAME_AS_HEX_SIZE_BYTES,
+				   hma->username->encrypted_data,
+				   HERMETIK_MAIL_ADDRESS_ENC_USERNAME_SIZE_BYTES);
+}
+
+void hermetik_mail_address_hostname_to_hex(const hermetik_mail_address *hma,
+										   char *hex)
+{
+	if (!hma 			||
+		!hma->hostname	||
+		!hma->hostname->data)
+	{
+		return;
+	}
+
+	sodium_bin2hex(hex,
+				   HERMETIK_MAIL_ADDRESS_HOSTNAME_AS_HEX_SIZE_BYTES,
+				   hma->hostname->data,
+				   HERMETIK_MAIL_ADDRESS_HOSTNAME_SIZE_BYTES);
+}
+
+void hermetik_mail_address_enc_hostname_to_hex(const hermetik_mail_address *hma,
+											   char *hex)
+{
+	if (!hma	||
+		!hma->hostname	||
+		!hma->hostname->encrypted_data)
+	{
+		return;
+	}
+
+	sodium_bin2hex(hex,
+				   HERMETIK_MAIL_ADDRESS_ENC_HOSTNAME_AS_HEX_SIZE_BYTES,
+				   hma->hostname->encrypted_data,
+				   HERMETIK_MAIL_ADDRESS_ENC_HOSTNAME_SIZE_BYTES);
+}
 
 
 
